@@ -1,4 +1,6 @@
-
+var notes = 0;
+var labs = 0;
+var meds = 0;
 function loadData() {
   id = window.location.hash.substring(1);
   loadPatient(id);
@@ -8,10 +10,6 @@ function loadData() {
 }
 
 function loadPatientPanels(id_string) {
-  //console.log("Hi, this is the loadPatientPanelFunction");
-  //var patient_id = id_string.split("-")[2];
-  //loadPatientPanel(patient_id);
-
   for (i = 0; i < 4; i++) {
      loadPatientPanel(i);
      patientsNavbar(i);
@@ -38,7 +36,7 @@ function loadPatient(id) {
      img_source = "./images/Mac_Intosh.jpg"
   } else if (patient_id == 3) {
      img_source = "./images/Mike_Rosoft.jpg"
-  } else {
+  } else if (patient_id == 4) {
      img_source = "./images/Java_Script.jpg"
   }
 
@@ -63,16 +61,39 @@ function loadPatient(id) {
     } else {
       $( ".cardiac-text").html("False");
     }
+    for (i = 0; i < data["clinical_notes"].length; i++) {
+       $( ".clinical_note" + i).html(data["clinical_notes"][i]["note"]); 
+       $( ".clinical_date" + i).html(data["clinical_notes"][i]["date"]); 
+       if (notes < data["clinical_notes"].length) {
+          $( "div#progressModal .modal-body" ).append("<table class=\"table table-condensed\"> <tr> <th scope='row'>Date</th><td class='clinical_date" + i +"'></td></tr><tr> <th scope=\"row\">Notes</th><td class='clinical_note" + i + "'></td></tr></table>");
+       }
+       notes = notes + 1;
+    }
+    for (i = 0; i < data["labs"].length; i++) {
+       $( ".lab_date" + i).html(data["labs"][i]["date"]); 
+       $( ".lab_name" + i).html(data["labs"][i]["testName"]); 
+       $( ".lab_description" + i).html(data["labs"][i]["description"]); 
+       $( ".lab_value" + i).html(data["labs"][i]["value"]); 
+       $( ".lab_units" + i).html(data["labs"][i]["valueUnits"]); 
+       if ( labs < data["labs"].length) {
+          $( "div#labsModal .modal-body" ).append("<table class=\"table table-condensed\"> <tr> <th scope='row'>Date</th><td class='lab_date" + i + "'></td></tr><tr> <th scope='row'>Name</th><td class='lab_name" + i + "'></td></tr><tr> <th scope='row'>Description</th><td class='lab_description" + i + "'></td></tr><tr> <th scope='row'>Value</th><td class='lab_value" + i + "'></td></tr><tr> <th scope='row'>Units</th><td class='lab_units" + i + "'></td></tr></table>");
+       }
+       labs = labs + 1;
+    }
 
+    for (i = 0; i < data["meds"].length; i++) {
+       $( ".meds_date" + i).html(data["meds"][i]["date"]); 
+       $( ".meds_label" + i).html(data["meds"][i]["label"]); 
+       $( ".meds_dose" + i).html(data["meds"][i]["dose"]); 
+       $( ".meds_unit" + i).html(data["meds"][i]["doseUnits"]);   
+       $( ".meds_route" + i).html(data["meds"][i]["route"]);    
+       if ( meds < data["meds"].length) {
+          $( "div#medsModal .modal-body" ).append("<table class=\"table table-condensed\"> <tr> <th scope='row'>Date</th><td class='meds_date" + i + "'></td></tr><tr> <th scope='row'>Label</th><td class='meds_label" + i + "'></td></tr><tr> <th scope='row'>Dose</th><td class='meds_dose" + i + "'></td></tr><tr> <th scope='row'>Units</th><td class='meds_unit" + i + "'></td></tr><tr> <th scope='row'>Route</th><td class='meds_route" + i + "'></td></tr></table>");
+       }
+       meds = meds + 1;  
+    }
   });
-
-  $.getJSON('/patients.json', function(data) {
-    patient_data = data['patients'][id];
-//    $( "div#dataModal .modal-body" ).html(patient_data['clinical-data']['html']);
-    $( "div#labsModal .modal-body" ).html(patient_data['labs-data']['html']);
-    $( "div#medsModal .modal-body" ).html(patient_data['meds-data']['html']);
-    $( "div#progressModal .modal-body" ).html(patient_data['progress-data']['html']);
-  } );
+  setTimeout("loadData()",1000);
 }
 
 function patientsNavbar(id) {
@@ -82,3 +103,4 @@ function patientsNavbar(id) {
     navbar_obj.find(".patient-name-navbar").html(patient_data["name"]);
   });
 }
+
