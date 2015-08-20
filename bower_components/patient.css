@@ -110,3 +110,8 @@ height:50px;
     margin-top: 10px;
     margin-left: 18%;
 }
+
+.modal .modal-body {
+    max-height: 420px;
+    overflow-y: auto;
+}
