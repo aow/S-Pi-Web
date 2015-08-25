@@ -17,7 +17,7 @@ function loadPatientPanels(id_string) {
 }
 
 function loadPatientPanel(id) {
-  $.getJSON('http://api.s-pi-demo.com/patients', function(data) {
+  $.getJSON(API_HOST + 'patients', function(data) {
     var patient_data = data[id+1];
     var patient_obj = $("#patient-" + id);
     patient_obj.find(".patient-name-text").html(patient_data["name"]);
@@ -40,7 +40,7 @@ function loadPatient(id) {
      img_source = "./images/Java_Script.jpg"
   }
 
-  $.getJSON('http://api.s-pi-demo.com/patients/'+patient_id, function(data) {
+  $.getJSON(API_HOST + 'patients/'+patient_id, function(data) {
     $(document).prop('title', 'S-Pi Patient Information: ' + data["name"]);
     $( "#patient-image").html("<img src='" + img_source + "' alt='Patient Image' width='100px'>");
     $( ".name-text").html(data["name"]);
@@ -97,7 +97,7 @@ function loadPatient(id) {
 }
 
 function patientsNavbar(id) {
-  $.getJSON('http://api.s-pi-demo.com/patients', function(data) {
+  $.getJSON(API_HOST + 'patients', function(data) {
     var patient_data = data[id+1];
     var navbar_obj = $("#navbar-" + id);
     navbar_obj.find(".patient-name-navbar").html(patient_data["name"]);

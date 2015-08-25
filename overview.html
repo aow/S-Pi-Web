@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="./smoothie_graphs/constants.js"></script>
         <script src="./bower_components/react/react.js"></script>
         <script src="./bower_components/react/JSXTransformer.js"></script>
         <script src="./bower_components/jquery/dist/jquery.min.js"></script>
@@ -320,7 +321,7 @@
       <!--  javaScript for the ecg graphs   -->
       <script type="text/javascript">
         $(document).ready(function() {
-          var eb = new vertx.EventBus("http://api.s-pi-demo.com/streambus");
+          var eb = new vertx.EventBus(API_HOST + "streambus");
           jQuery(function($) {
               ecg_graph(eb);
           });
