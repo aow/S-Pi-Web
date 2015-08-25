@@ -15,7 +15,7 @@ function ecg_graph(eb) {
     var chartArray = [];
 
     var startGraph = function (stream, type, id) {
-        $.when($.ajax('http://api.s-pi-demo.com/stream/'+stream+'/'+type+'/'+(id-1))).done(
+        $.when($.ajax(API_HOST + 'stream/'+stream+'/'+type+'/'+(id-1))).done(
             function (data) {
                 var channelName = data;
                 var startTime = Date.now();
@@ -101,10 +101,10 @@ function ecg_graph(eb) {
       setInterval(drawIt, 400);
 
       console.log("Onopen");
-      $.when($.ajax("http://api.s-pi-demo.com/alerts/1"),
-              $.ajax("http://api.s-pi-demo.com/alerts/2"),
-              $.ajax("http://api.s-pi-demo.com/alerts/3"),
-              $.ajax("http://api.s-pi-demo.com/alerts/4")
+      $.when($.ajax(API_HOST + "alerts/1"),
+              $.ajax(API_HOST + "alerts/2"),
+              $.ajax(API_HOST + "alerts/3"),
+              $.ajax(API_HOST + "alerts/4")
             ).done(get_alert);
 
     }
