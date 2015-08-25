@@ -1,66 +1,66 @@
 /*http://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/
 
-.navbar-default {
+.navbar-default2 {
     background-color: #6baed6;
     border-color: #2171b5;
 }
-.navbar-default .navbar-brand {
+.navbar-default2 .navbar-brand2 {
     color: #ecf0f1;
 }
-.navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
+.navbar-default2 .navbar-brand2:hover, .navbar-default2 .navbar-brand2:focus {
     color: #bdd7e7;
 }
-.navbar-default .navbar-text {
+.navbar-default2 .navbar-text2 {
     color: #ecf0f1;
 }
-.navbar-default .navbar-nav > li > a {
+.navbar-default2 .navbar-nav2 > li > a {
     color: #ecf0f1;
 }
-.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+.navbar-default2 .navbar-nav2 > li > a:hover, .navbar-default2 .navbar-nav2 > li > a:focus {
     color: #bdd7e7;
 }
-.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+.navbar-default2 .navbar-nav2 > .active > a, .navbar-default2 .navbar-nav2 > .active > a:hover, .navbar-default2 .navbar-nav2> .active > a:focus {
     color: #bdd7e7;
     background-color: #2171b5;
 }
-.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+.navbar-default2 .navbar-nav2 > .open > a, .navbar-default2 .navbar-nav2 > .open > a:hover, .navbar-default2 .navbar-nav2 > .open > a:focus {
     color: #bdd7e7;
     background-color: #2171b5;
 }
-.navbar-default .navbar-toggle {
+.navbar-default2 .navbar-toggle2 {
     border-color: #2171b5;
 }
-.navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+.navbar-default2 .navbar-toggle2:hover, .navbar-default2 .navbar-toggle2:focus {
     background-color: #2171b5;
 }
-.navbar-default .navbar-toggle .icon-bar {
+.navbar-default2 .navbar-toggle2 .icon-bar2 {
     background-color: #ecf0f1;
 }
-.navbar-default .navbar-collapse,
-.navbar-default .navbar-form {
+.navbar-default2 .navbar-collapse2,
+.navbar-default2 .navbar-form2 {
     border-color: #ecf0f1;
 }
-.navbar-default .navbar-link {
+.navbar-default2 .navbar-link2 {
     color: #ecf0f1;
 }
-.navbar-default .navbar-link:hover {
+.navbar-default2 .navbar-link2:hover {
     color: #bdd7e7;
 }
 
 @media (max-width: 767px) {
-    .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+    .navbar-default2 .navbar-nav2 .open2 .dropdown-menu2 > li > a {
         color: #ecf0f1;
     }
-    .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+    .navbar-default2 .navbar-nav2 .open2 .dropdown-menu2 > li > a:hover, .navbar-default2 .navbar-nav2 .open2 .dropdown-menu2 > li > a:focus {
         color: #bdd7e7;
     }
-    .navbar-default .navbar-nav .open .dropdown-menu > .active > a, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+    .navbar-default2 .navbar-nav2 .open2 .dropdown-menu2 > .active > a, .navbar-default2 .navbar-nav2 .open2 .dropdown-menu2 > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
         color: #bdd7e7;
         background-color: #2171b5;
     }
 }
 
-.navbar-brand > img{
+.navbar-brand2 > img{
     object-fit: contain;
     max-height:200%;
     height: 200%;
