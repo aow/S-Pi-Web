@@ -37,7 +37,7 @@ $("#graphs").click(function() {
 
 
   var startGraph = function (stream, type, id) {
-    $.when($.ajax('http://api.s-pi-demo.com/stream/'+stream+'/'+type+'/'+(id-1))).done(
+    $.when($.ajax(API_HOST + 'stream/'+stream+'/'+type+'/'+(id-1))).done(
       function (data) {
         var channelName = data;
         var startTime = Date.now();
