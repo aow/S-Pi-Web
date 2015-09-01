@@ -7,10 +7,11 @@ var graphOff = 0;
 function detail_graphs(eb) {
   var currentBuffers = {};
   var neededGraphs = [];
+  var hash = $(this).attr('href').split('#')[1];
   neededGraphs.push(['waveform', 'ECG', 1]);
   neededGraphs.push(['waveform', 'ABP', 2]);
   neededGraphs.push(['waveform', 'RESP', 3]);
-  neededGraphs.push(['waveform', 'PAP', 4]);
+  neededGraphs.push(['waveform', 'PAP', 1]);
 
   console.log("hi");
   console.log(neededGraphs);
@@ -42,7 +43,7 @@ $("#graphs").click(function() {
         var channelName = data;
         var startTime = Date.now();
         currentBuffers[channelName] = new Array();
-        var chart = makeSmoothie('chart' + id);
+        var chart = makeSmoothie(type);
         currentGraphs.push({"channel": channelName,
           "startTime": startTime,
           "buffer": currentBuffers[channelName],
@@ -57,11 +58,11 @@ $("#graphs").click(function() {
 
   var makeSmoothie = function (id) {
     color = "green";
-    if (id == "chart1") {
+    if (id === "ECG") {
         color = "red";
-    } else if (id == "chart2") {
+    } else if (id === "ABP") {
         color = "green";
-    } else if (id == "chart3") {
+    } else if (id === "RESP") {
         color = "blue";
     } else {
         color = "yellow";
@@ -94,7 +95,7 @@ $("#graphs").click(function() {
     clearTimeout(timer);
     timer = setTimeout(handleResize, 100);
     setInterval(drawIt, 400);
-  }
+  };
 }
 var handleResize = function () {
   for (var i = 0; i < currentGraphs.length; i++) {
