@@ -7,7 +7,7 @@ var graphOff = 0;
 function detail_graphs(eb) {
   var currentBuffers = {};
   var neededGraphs = [];
-  var hash = $(this).attr('href').split('#')[1];
+  //var hash = $(this).attr('href').split('#')[1];
   neededGraphs.push(['waveform', 'ECG', 1]);
   neededGraphs.push(['waveform', 'ABP', 2]);
   neededGraphs.push(['waveform', 'RESP', 3]);
@@ -52,6 +52,9 @@ $("#graphs").click(function() {
         eb.registerHandler(channelName, function(msg) {
           currentBuffers[channelName].push(msg.data);
         });
+        // Initial resize of graphs to fix having to resize manually.
+        chart.chart.canvas.width = chart.chart.canvas.parentNode.offsetWidth;
+        chart.chart.resize();
       }
     )
   };
@@ -88,12 +91,10 @@ $("#graphs").click(function() {
   };
 
   eb.onopen = function () {
-    var timer;
     for (var i = neededGraphs.length - 1; i >= 0; i--) {
       startGraph(neededGraphs[i][0], neededGraphs[i][1], neededGraphs[i][2]);
     }
-    clearTimeout(timer);
-    timer = setTimeout(handleResize, 100);
+    handleResize();
     setInterval(drawIt, 400);
   };
 }

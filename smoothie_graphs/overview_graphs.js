@@ -29,6 +29,9 @@ function ecg_graph(eb) {
                 eb.registerHandler(channelName, function(msg) {
                     currentBuffers[channelName].push(msg.data);
                 });
+                // Initial resize of graphs to fix having to resize manually.
+                chart.chart.canvas.width = chart.chart.canvas.parentNode.offsetWidth;
+                chart.chart.resize();
             }
         )
     };
@@ -91,13 +94,11 @@ function ecg_graph(eb) {
     };
 
     eb.onopen = function () {
-      var timer;
       eb.registerHandler("restart", handleRestart);
       for (var i = neededGraphs.length - 1; i >= 0; i--) {
         startGraph(neededGraphs[i][0], neededGraphs[i][1], neededGraphs[i][2]);
       }
-      clearTimeout(timer);
-      timer = setTimeout(handleResize, 100);
+      handleResize();
       setInterval(drawIt, 400);
 
       console.log("Onopen");
