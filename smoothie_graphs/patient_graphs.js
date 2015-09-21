@@ -44,13 +44,36 @@ $("#graphs").click(function() {
         var startTime = Date.now();
         currentBuffers[channelName] = new Array();
         var chart = makeSmoothie(type);
-        currentGraphs.push({"channel": channelName,
+        var info = {"channel": channelName,
           "startTime": startTime,
           "buffer": currentBuffers[channelName],
           "graph": chart.series,
-          "chart": chart.chart});
+          "chart": chart.chart,
+          "lastReceived": Date.now()};
+        currentGraphs.push(info);
         eb.registerHandler(channelName, function(msg) {
+          //var data = msg.data;
+          
+          // if (typeof data !== 'undefined') {
+          //   for (var i = 0; i < data.length; i++) {
+          //     chart.series.append(startTime, data[i].SIGNAL);
+          //     startTime += 8;
+          //   }
+          // }
+          // if (typeof data !== 'undefined') {
+          //   var l = data.length;
+          //   while (l--) {
+          //     chart.series.append(startTime, data[l].SIGNAL, false);
+          //     startTime += 8;
+          //   }
+          // }
+          // if (Date.now() - info.lastReceived > 2000) {
+          //   info.startTime = Date.now();
+          // }
           currentBuffers[channelName].push(msg.data);
+          info.startTime = Date.now();
+          info.lastReceived = Date.now();
+          
         });
         // Initial resize of graphs to fix having to resize manually.
         chart.chart.canvas.width = chart.chart.canvas.parentNode.offsetWidth;
@@ -60,7 +83,7 @@ $("#graphs").click(function() {
   };
 
   var makeSmoothie = function (id) {
-    color = "green";
+    var color = "green";
     if (id === "ECG") {
         color = "red";
     } else if (id === "ABP") {
@@ -70,11 +93,11 @@ $("#graphs").click(function() {
     } else {
         color = "yellow";
     }
-    var chart = new SmoothieChart({millisPerPixel:8, strokeStyle:color});
+    var chart = new SmoothieChart({millisPerPixel:8, interpolation:'linear', enableDpiScaling: false});
     var canvas = document.getElementById(id);
     var series = new TimeSeries();
     chart.addTimeSeries(series, {lineWidth:2,strokeStyle:color});
-    chart.streamTo(canvas, 1720);
+    chart.streamTo(canvas, 3000);
     return {"series": series, "chart": chart};
   };
 
@@ -82,20 +105,24 @@ $("#graphs").click(function() {
     currentGraphs.forEach(function (item, idx, thisArray) {
       var data = item["buffer"].shift();
       if (typeof data !== 'undefined') {
-        for (var i = data.length - 1; i >= 0; i--) {
-          item["graph"].append(item["startTime"], data[i].SIGNAL);
-          item["startTime"] += 8;
+        var sTime = item.startTime;
+        //for (var i = data.length - 1; i >= 0; i--) {
+        for (var i = 0; i < data.length; i++) {  
+          item["graph"].append(sTime, data[i].SIGNAL);
+          sTime += 8;
         }
       }
     });
+    setTimeout(drawIt, 800);
   };
-
+  
   eb.onopen = function () {
-    for (var i = neededGraphs.length - 1; i >= 0; i--) {
+    //for (var i = neededGraphs.length - 1; i >= 0; i--) {
+    for (var i = 0; i < neededGraphs.length; i++) {  
       startGraph(neededGraphs[i][0], neededGraphs[i][1], neededGraphs[i][2]);
     }
-    handleResize();
-    setInterval(drawIt, 400);
+    setTimeout(drawIt, 400);
+    //checkLastReceived();
   };
 }
 var handleResize = function () {
@@ -105,4 +132,14 @@ var handleResize = function () {
     mycanvas.width = mycanvas.parentNode.offsetWidth;
     currentGraphs[i].chart.resize();
   }
+};
+
+var checkLastReceived = function() {
+  currentGraphs.forEach(function(item, idx, thisArray) {
+    if (Date.now() - item.lastReceived > 2000) {
+      item.startTime = Date.now();
+    }
+  });
+  
+  setTimeout(checkLastReceived, 1000);
 };

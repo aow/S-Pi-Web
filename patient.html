@@ -4,9 +4,9 @@
     <script src="./smoothie_graphs/constants.js"></script>
     <script src="./bower_components/jquery/dist/jquery.min.js"></script>
     <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="./bower_components/smoothie/smoothie.js"></script>
     <script src="./bower_components/sockjs/sockjs.js"></script>
     <script src="./smoothie_graphs/vertxbus.js"></script>
+    <script src="./bower_components/smoothie/smoothie.js"></script>    
     <script src="./smoothie_graphs/patient_graphs.js"></script>
     <script src="./s-pi.js"></script>
     <script>
@@ -309,11 +309,10 @@
     </div>
     <script type="text/javascript">
       $(document).ready(function() {
-        var eb = new vertx.EventBus("http://api.s-pi-demo.com/streambus");
+        var eb = new vertx.EventBus(API_HOST + "streambus");
         jQuery(function($) {
           detail_graphs(eb);
         });
-        handleResize();
       });
     </script>
 
