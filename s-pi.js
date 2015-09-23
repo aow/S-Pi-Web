@@ -2,15 +2,15 @@ var notes = 0;
 var labs = 0;
 var meds = 0;
 function loadData() {
-  id = window.location.hash.substring(1);
+  var id = window.location.hash.substring(1);
   loadPatient(id);
-  for (i = 0; i < 4; i++) {
+  for (var i = 0; i < 4; i++) {
      patientsNavbar(i);
   }
 }
 
 function loadPatientPanels(id_string) {
-  for (i = 0; i < 4; i++) {
+  for (var i = 0; i < 4; i++) {
      loadPatientPanel(i);
      patientsNavbar(i);
   }
@@ -29,7 +29,8 @@ function loadPatientPanel(id) {
 }
 
 function loadPatient(id) {
-  patient_id = parseInt(id) + 1
+  var patient_id = parseInt(id) + 1;
+  var img_source;
   if (patient_id == 1) {
      img_source = "./images/Ann_Droid.jpg"
   } else if (patient_id == 2) {
@@ -61,7 +62,7 @@ function loadPatient(id) {
     } else {
       $( ".cardiac-text").html("False");
     }
-    for (i = 0; i < data["clinical_notes"].length; i++) {
+    for (var i = 0; i < data["clinical_notes"].length; i++) {
        $( ".clinical_note" + i).html(data["clinical_notes"][i]["note"]); 
        $( ".clinical_date" + i).html(data["clinical_notes"][i]["date"]); 
        if (notes < data["clinical_notes"].length) {
@@ -69,7 +70,7 @@ function loadPatient(id) {
        }
        notes = notes + 1;
     }
-    for (i = 0; i < data["labs"].length; i++) {
+    for (var i = 0; i < data["labs"].length; i++) {
        $( ".lab_date" + i).html(data["labs"][i]["date"]); 
        $( ".lab_name" + i).html(data["labs"][i]["testName"]); 
        $( ".lab_description" + i).html(data["labs"][i]["description"]); 
@@ -81,7 +82,7 @@ function loadPatient(id) {
        labs = labs + 1;
     }
 
-    for (i = 0; i < data["meds"].length; i++) {
+    for (var i = 0; i < data["meds"].length; i++) {
        $( ".meds_date" + i).html(data["meds"][i]["date"]); 
        $( ".meds_label" + i).html(data["meds"][i]["label"]); 
        $( ".meds_dose" + i).html(data["meds"][i]["dose"]); 
