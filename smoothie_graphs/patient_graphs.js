@@ -1,11 +1,12 @@
 // JavaScript function for calling the api to get the graph data
 // points and populating the flot graphs. This fucntion is specifically.
 // for the ecg graphs on the patient graphs.
+//"use strict";
 var currentGraphs = [];
 var graphOff = 0;
 
 function detail_graphs(eb) {
-  var currentBuffers = {};
+  //var currentBuffers = {};
   var neededGraphs = [];
   //var hash = $(this).attr('href').split('#')[1];
   neededGraphs.push(['waveform', 'ECG', 1]);
@@ -13,76 +14,89 @@ function detail_graphs(eb) {
   neededGraphs.push(['waveform', 'RESP', 3]);
   neededGraphs.push(['waveform', 'PAP', 1]);
 
-  console.log("hi");
   console.log(neededGraphs);
 
-$("#graphs").click(function() {
-  var egraph = document.getElementById("graphs");
-  if (graphOff == 0) {
-     for (var i = currentGraphs.length-1; i >= 0; i--) {
-        currentGraphs[i].chart.stop();
-     }
-     graphOff = 1;
-     egraph.innerHTML = "Turn Graphs ON";
-     alert('Graphs have been turned OFF');
-  }
-  else {
-     for (var i = currentGraphs.length-1; i >= 0; i--) {
-        currentGraphs[i].chart.start();
-     }
-     graphOff = 0;
-     egraph.innerHTML = "Turn Graphs OFF";
-     alert('Graphs have been turned ON');
-  }
-});
-
-
-  var startGraph = function (stream, type, id) {
-    $.when($.ajax(API_HOST + 'stream/'+stream+'/'+type+'/'+(id-1))).done(
+  var startGraph = function (stream, gtype, id) {
+    $.when($.ajax(API_HOST + 'stream/'+stream+'/'+gtype+'/'+(id-1))).done(
       function (data) {
         var channelName = data;
+        //var startTime = Date.now();
+        //currentBuffers[channelName] = new Array();
+        var buffer = [];
+        var chart = makeSmoothie(gtype);
         var startTime = Date.now();
-        currentBuffers[channelName] = new Array();
-        var chart = makeSmoothie(type);
+        var lastReceived = 0;
         var info = {"channel": channelName,
-          "startTime": startTime,
-          "buffer": currentBuffers[channelName],
-          "graph": chart.series,
+          //"startTime": Date.now(),
+          //"buffer": lBuffer,
+          //"graph": chart.series,
           "chart": chart.chart,
-          "lastReceived": Date.now()};
+          //"lastReceived": Date.now()
+        };
+          
         currentGraphs.push(info);
         eb.registerHandler(channelName, function(msg) {
-          //var data = msg.data;
-          
-          // if (typeof data !== 'undefined') {
-          //   for (var i = 0; i < data.length; i++) {
-          //     chart.series.append(startTime, data[i].SIGNAL);
-          //     startTime += 8;
-          //   }
-          // }
-          // if (typeof data !== 'undefined') {
-          //   var l = data.length;
-          //   while (l--) {
-          //     chart.series.append(startTime, data[l].SIGNAL, false);
-          //     startTime += 8;
-          //   }
-          // }
-          // if (Date.now() - info.lastReceived > 2000) {
-          //   info.startTime = Date.now();
-          // }
-          currentBuffers[channelName].push(msg.data);
-          info.startTime = Date.now();
-          info.lastReceived = Date.now();
-          
+          if (Date.now() - lastReceived > 3000) {
+            startTime = Date.now();
+          }
+          buffer.push.apply(buffer, msg.data);
+          //info.startTime = Date.now();
+          lastReceived = Date.now();
         });
+        
         // Initial resize of graphs to fix having to resize manually.
         chart.chart.canvas.width = chart.chart.canvas.parentNode.offsetWidth;
         chart.chart.resize();
+        var drawSingle = function() {
+          if (typeof buffer !== 'undefined') {
+            var sTime = Date.now();
+            var runLen = buffer.length < 150 ? buffer.length : 150;
+            for (var i = 0; i < runLen; i++) {
+              if (typeof buffer[i] !== 'undefined') {
+                chart.series.append(sTime, buffer[i].SIGNAL);
+                sTime += 8;
+              }
+            }
+          }
+          //startTime = sTime;
+          setTimeout(drawSingle, (runLen * 8));
+        };
+        
+        drawSingle();
       }
-    )
+    );
   };
 
-  var makeSmoothie = function (id) {
+  eb.onopen = function () {
+    console.log("in eb open");
+    for (var i = 0; i < neededGraphs.length; i++) {  
+      startGraph(neededGraphs[i][0], neededGraphs[i][1], neededGraphs[i][2]);
+    }
+    console.log(currentGraphs);
+  };
+  
+  $("#graphs").click(function () {
+    var egraph = document.getElementById("graphs");
+    if (graphOff == 0) {
+      for (var i = currentGraphs.length - 1; i >= 0; i--) {
+        currentGraphs[i].chart.stop();
+      }
+      graphOff = 1;
+      egraph.innerHTML = "Turn Graphs ON";
+      alert('Graphs have been turned OFF');
+    }
+    else {
+      for (var i = currentGraphs.length - 1; i >= 0; i--) {
+        currentGraphs[i].chart.start();
+      }
+      graphOff = 0;
+      egraph.innerHTML = "Turn Graphs OFF";
+      alert('Graphs have been turned ON');
+    }
+  });
+}
+
+var makeSmoothie = function (id) {
     var color = "green";
     if (id === "ECG") {
         color = "red";
@@ -101,30 +115,6 @@ $("#graphs").click(function() {
     return {"series": series, "chart": chart};
   };
 
-  var drawIt = function () {
-    currentGraphs.forEach(function (item, idx, thisArray) {
-      var data = item["buffer"].shift();
-      if (typeof data !== 'undefined') {
-        var sTime = item.startTime;
-        //for (var i = data.length - 1; i >= 0; i--) {
-        for (var i = 0; i < data.length; i++) {  
-          item["graph"].append(sTime, data[i].SIGNAL);
-          sTime += 8;
-        }
-      }
-    });
-    setTimeout(drawIt, 800);
-  };
-  
-  eb.onopen = function () {
-    //for (var i = neededGraphs.length - 1; i >= 0; i--) {
-    for (var i = 0; i < neededGraphs.length; i++) {  
-      startGraph(neededGraphs[i][0], neededGraphs[i][1], neededGraphs[i][2]);
-    }
-    setTimeout(drawIt, 400);
-    //checkLastReceived();
-  };
-}
 var handleResize = function () {
   for (var i = 0; i < currentGraphs.length; i++) {
     console.log('resized' + i);
@@ -134,12 +124,34 @@ var handleResize = function () {
   }
 };
 
-var checkLastReceived = function() {
-  currentGraphs.forEach(function(item, idx, thisArray) {
-    if (Date.now() - item.lastReceived > 2000) {
-      item.startTime = Date.now();
-    }
-  });
-  
-  setTimeout(checkLastReceived, 1000);
-};
+// var drawSingle = function(graphInfo) {
+//   if (graphInfo.buffer !== 'undefined') {
+//     //var sTime = graphInfo.startTime;
+//     var runLen = graphInfo.buffer.length < 150 ? graphInfo.buffer.length : 150;
+//     for (var i = 0; i < runLen; i++) {
+//       if (typeof graphInfo.buffer[i] !== 'undefined') {
+//         graphInfo.graph.append(graphInfo.startTime, graphInfo.buffer[i].SIGNAL);
+//         graphInfo.startTime += 8;
+//       }
+//     }
+//   }
+//   //graphInfo.startTime = sTime;
+//   setTimeout(drawSingle, 400, graphInfo);
+// };
+
+var drawIt = function () {
+    currentGraphs.forEach(function (item, idx, thisArray) {
+      //var data = item["buffer"].shift();
+      if (typeof item !== 'undefined') {
+        var sTime = item.startTime;
+        var runLen = item.buffer.length < 100 ? item.buffer.length : 100;
+        for (var i = 0; i < runLen; i++) {
+          if (typeof item.buffer[i] !== 'undefined') {
+            item.graph.append(sTime, item.buffer[i].SIGNAL);
+            sTime += 8;
+          }
+        }
+      }
+    });
+    setTimeout(drawIt, 1000);
+  };

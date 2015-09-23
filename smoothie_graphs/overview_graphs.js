@@ -14,26 +14,51 @@ function ecg_graph(eb) {
     var alertOff = 0;
     var chartArray = [];
 
-    var startGraph = function (stream, type, id) {
-        $.when($.ajax(API_HOST + 'stream/'+stream+'/'+type+'/'+(id-1))).done(
+    var startGraph = function (stream, gtype, id) {
+        $.when($.ajax(API_HOST + 'stream/' + stream + '/' + gtype + '/' + (id - 1))).done(
             function (data) {
                 var channelName = data;
                 var startTime = Date.now();
-                currentBuffers[channelName] = new Array();
+                //currentBuffers[channelName] = new Array();
+                var buffer = [];
                 var chart = makeSmoothie('chart' + id);
-                currentGraphs.push({"channel": channelName,
-                    "startTime": startTime,
-                    "buffer": currentBuffers[channelName],
-                    "graph": chart.series,
-                    "chart": chart.chart});
-                eb.registerHandler(channelName, function(msg) {
-                    currentBuffers[channelName].push(msg.data);
+                var lastReceived = 0;
+                var info = {
+                    "channel": channelName,
+                    //"startTime": startTime,
+                    //"buffer": currentBuffers[channelName],
+                    //"graph": chart.series,
+                    "chart": chart.chart
+                };
+                currentGraphs.push(info);
+                eb.registerHandler(channelName, function (msg) {
+                    if (Date.now() - lastReceived > 3000) {
+                        startTime = Date.now();
+                    }
+                    buffer.push.apply(buffer, msg.data);
+                    lastReceived = Date.now();
                 });
+                
                 // Initial resize of graphs to fix having to resize manually.
                 chart.chart.canvas.width = chart.chart.canvas.parentNode.offsetWidth;
                 chart.chart.resize();
-            }
-        )
+                
+                var drawSingle = function() {
+                  if (typeof buffer !== 'undefined') {
+                      var sTime = Date.now();
+                      var runLen = buffer.length < 150 ? buffer.length : 150;
+                      for (var i = 0; i < runLen; i++) {
+                          if (typeof buffer[i] !== 'undefined') {
+                              chart.series.append(sTime, buffer[i].SIGNAL);
+                              sTime += 8;
+                          }
+                      }
+                  }
+                  setTimeout(drawSingle, (runLen * 8));
+                };
+                
+                drawSingle();
+            });
     };
 
     $("#graph").click(function() {
@@ -76,7 +101,7 @@ function ecg_graph(eb) {
         var canvas = document.getElementById(id);
         var series = new TimeSeries();
         chart.addTimeSeries(series, {lineWidth:2,strokeStyle:'green'});
-        chart.streamTo(canvas, 1720);
+        chart.streamTo(canvas, 3000);
         chartArray[chartArray.length] = chart;
         return {"series": series, "chart": chart};
     };
@@ -94,14 +119,13 @@ function ecg_graph(eb) {
     };
 
     eb.onopen = function () {
-      eb.registerHandler("restart", handleRestart);
       for (var i = neededGraphs.length - 1; i >= 0; i--) {
         startGraph(neededGraphs[i][0], neededGraphs[i][1], neededGraphs[i][2]);
       }
-      handleResize();
-      setInterval(drawIt, 400);
+      //handleResize();
+      //setInterval(drawIt, 400);
 
-      console.log("Onopen");
+      //console.log("Onopen");
       $.when($.ajax(API_HOST + "alerts/1"),
               $.ajax(API_HOST + "alerts/2"),
               $.ajax(API_HOST + "alerts/3"),
@@ -171,7 +195,7 @@ function ecg_graph(eb) {
              $('#alertModal').modal('show');
         }
 
-        $.getJSON('http://api.s-pi-demo.com/patients', function(data) {
+        $.getJSON(API_HOST + 'patients', function(data) {
             Alert.name = data[(Alert.id)]['name'];
             Alert.age =  data[(Alert.id)]['age'];
             Alert.bed =  data[(Alert.id)]['bed'];
